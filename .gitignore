@@ -12,3 +12,5 @@ wheels/
 .env
 LEMONAIDE_EVIDENCEOPS_PHASED_IMPLEMENTATION_PLAN.md
 INDEX.md
+.db*
+lemonaide.db

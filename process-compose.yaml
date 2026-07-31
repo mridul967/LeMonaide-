@@ -1,0 +1,16 @@
+version: "0.5"
+
+processes:
+  backend:
+    command: "uv run uvicorn api.main:app --host 127.0.0.1 --port 8741 --reload"
+    working_dir: "backend"
+    environment:
+      - "PORT=8741"
+      - "PYTHONUNBUFFERED=1"
+
+  frontend:
+    command: "bun run dev -- -p 3741"
+    working_dir: "frontend"
+    environment:
+      - "PORT=3741"
+      - "NEXT_PUBLIC_API_URL=http://127.0.0.1:8741/api/v1"

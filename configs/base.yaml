@@ -1,0 +1,47 @@
+app_name: "lemonaide"
+environment: "development"
+api_prefix: "/api/v1"
+
+capabilities:
+  dataset_ingestion:
+    supported_formats: ["csv", "parquet"]
+    max_size_mb: 500
+  model_families:
+    - id: "logistic_regression"
+      name: "Logistic Regression"
+      category: "linear"
+    - id: "random_forest"
+      name: "Random Forest Classifier"
+      category: "tree_ensemble"
+    - id: "xgboost"
+      name: "XGBoost Classifier"
+      category: "gradient_boosted"
+    - id: "pytorch"
+      name : "Neural Network"
+      category : "perceptron techinque"
+  metric_catalog:
+    - id: "accuracy"
+      name: "Accuracy"
+      optimization_direction: "maximize"
+    - id: "f1_weighted"
+      name: "Weighted F1-Score"
+      optimization_direction: "maximize"
+    - id: "log_loss"
+      name: "Log Loss"
+      optimization_direction: "minimize"
+  evidence_statuses:
+    - id: "unverified"
+      label: "Unverified Hypothesis"
+      category: "neutral"
+    - id: "verified"
+      label: "Verified Evidence Claim"
+      category: "positive"
+    - id: "rejected"
+      label: "Rejected / Falsified"
+      category: "negative"
+
+ui:
+  theme: "citrus-noir"
+  ports:
+    frontend: 3741
+    backend: 8741
