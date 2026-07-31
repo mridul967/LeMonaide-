@@ -17,6 +17,7 @@ dependencies = [
     "numpy>=1.26.0",
     "greenlet>=3.5.4",
     "python-multipart>=0.0.9",
+    "xgboost>=3.3.0",
 ]
 
 [tool.hatch.build.targets.wheel]

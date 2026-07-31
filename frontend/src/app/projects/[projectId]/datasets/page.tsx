@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { fetchProjectDatasets, seedDemoDataset, uploadDataset } from "@/lib/api-client";
 import { useState, useRef } from "react";
-import { Database, Upload, Sparkles, FileSpreadsheet, Hash, Layers, CheckCircle2, ArrowLeft } from "lucide-react";
+import { Database, Upload, Sparkles, FileSpreadsheet, CheckCircle2, ArrowLeft, Cpu } from "lucide-react";
 import Link from "next/link";
 
 export default function DatasetsPage() {
@@ -60,21 +60,28 @@ export default function DatasetsPage() {
         </div>
 
         <div className="flex items-center space-x-2">
+          <Link
+            href={`/projects/${projectId}/model-studio`}
+            className="flex items-center space-x-1 px-3 py-2 bg-[#181c2b] border border-[#242a3e] text-[#f0f4f8] text-xs font-semibold rounded-lg hover:border-[#d4e157] transition"
+          >
+            <Cpu className="w-4 h-4 text-[#d4e157]" />
+            <span>Model Studio →</span>
+          </Link>
           <button
             onClick={() => seedMutation.mutate()}
             disabled={seedMutation.isPending}
             className="flex items-center space-x-2 px-3 py-2 bg-[#d4e157]/10 border border-[#d4e157]/30 text-[#d4e157] text-xs font-semibold rounded-lg hover:bg-[#d4e157]/20 transition"
           >
             <Sparkles className="w-4 h-4" />
-            <span>{seedMutation.isPending ? "Generating..." : "Seed Failure Lab Dataset"}</span>
+            <span>{seedMutation.isPending ? "Generating..." : "Seed Dataset"}</span>
           </button>
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadMutation.isPending}
-            className="flex items-center space-x-2 px-4 py-2 bg-[#d4e157] text-[#0b0d13] text-xs font-semibold rounded-lg hover:bg-[#c0ca33] transition"
+            className="flex items-center space-x-2 px-3 py-2 bg-[#d4e157] text-[#0b0d13] text-xs font-semibold rounded-lg hover:bg-[#c0ca33] transition"
           >
             <Upload className="w-4 h-4" />
-            <span>{uploadMutation.isPending ? "Uploading..." : "Upload CSV / Parquet"}</span>
+            <span>{uploadMutation.isPending ? "Uploading..." : "Upload File"}</span>
           </button>
           <input ref={fileInputRef} type="file" accept=".csv,.parquet" onChange={handleFileUpload} className="hidden" />
         </div>
@@ -85,7 +92,6 @@ export default function DatasetsPage() {
         <div className="text-xs text-[#8b95a7]">Loading datasets...</div>
       ) : datasets && datasets.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Dataset Selection Sidebar */}
           <div className="space-y-3">
             <h3 className="text-xs font-semibold text-[#8b95a7] uppercase tracking-wider">Project Datasets</h3>
             {datasets.map((d) => (
@@ -93,7 +99,7 @@ export default function DatasetsPage() {
                 key={d.id}
                 onClick={() => setSelectedDatasetId(d.id)}
                 className={`citrus-card p-4 cursor-pointer transition ${
-                  (currentDataset?.id === d.id) ? "border-[#d4e157] bg-[#d4e157]/5" : "hover:border-[#242a3e]"
+                  currentDataset?.id === d.id ? "border-[#d4e157] bg-[#d4e157]/5" : "hover:border-[#242a3e]"
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -105,7 +111,6 @@ export default function DatasetsPage() {
             ))}
           </div>
 
-          {/* Dataset Profile Details */}
           {currentDataset && (
             <div className="md:col-span-2 space-y-4">
               <div className="citrus-card p-5 space-y-4">
@@ -120,7 +125,6 @@ export default function DatasetsPage() {
                   </span>
                 </div>
 
-                {/* Summary Metric Cards */}
                 <div className="grid grid-cols-3 gap-3">
                   <div className="p-3 bg-[#181c2b] rounded-lg border border-[#242a3e]">
                     <div className="text-[10px] text-[#8b95a7]">Total Samples (Rows)</div>
@@ -142,17 +146,16 @@ export default function DatasetsPage() {
                   </div>
                 </div>
 
-                {/* Feature Schema Table */}
                 <div className="space-y-2">
                   <h4 className="text-xs font-semibold text-[#f0f4f8]">Schema & Feature Summary</h4>
-                  <div className="overflow-x-auto border border-[#242a3e] rounded-lg">
+                  <div className="overflow-x-auto border border-[#242a3e] rounded-lg max-h-60">
                     <table className="w-full text-left text-xs text-[#8b95a7]">
-                      <thead className="bg-[#181c2b] text-[#f0f4f8] border-b border-[#242a3e]">
+                      <thead className="bg-[#181c2b] text-[#f0f4f8] border-b border-[#242a3e] sticky top-0">
                         <tr>
                           <th className="p-2.5">Feature Name</th>
                           <th className="p-2.5">Data Type</th>
                           <th className="p-2.5">Missing %</th>
-                          <th className="p-2.5">Distribution / Summary</th>
+                          <th className="p-2.5">Summary Stats</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#242a3e]">
@@ -182,18 +185,14 @@ export default function DatasetsPage() {
         <div className="citrus-card p-12 text-center space-y-4 max-w-md mx-auto">
           <FileSpreadsheet className="w-12 h-12 text-[#d4e157] mx-auto opacity-80" />
           <h3 className="text-base font-bold text-[#f0f4f8]">No Datasets Ingested Yet</h3>
-          <p className="text-xs text-[#8b95a7]">
-            Generate the Failure Lab demo dataset to test weak slice discovery, or upload your own CSV/Parquet file.
-          </p>
-          <div className="flex justify-center space-x-3 pt-2">
-            <button
-              onClick={() => seedMutation.mutate()}
-              disabled={seedMutation.isPending}
-              className="px-4 py-2 bg-[#d4e157] text-[#0b0d13] text-xs font-semibold rounded-lg hover:bg-[#c0ca33]"
-            >
-              {seedMutation.isPending ? "Generating..." : "Generate Demo Dataset"}
-            </button>
-          </div>
+          <p className="text-xs text-[#8b95a7]">Generate the Failure Lab demo dataset to test model training and weak slice discovery.</p>
+          <button
+            onClick={() => seedMutation.mutate()}
+            disabled={seedMutation.isPending}
+            className="px-4 py-2 bg-[#d4e157] text-[#0b0d13] text-xs font-semibold rounded-lg hover:bg-[#c0ca33]"
+          >
+            {seedMutation.isPending ? "Generating..." : "Generate Demo Dataset"}
+          </button>
         </div>
       )}
     </div>

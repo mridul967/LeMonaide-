@@ -56,6 +56,30 @@ export interface DatasetEntity {
   created_at: string;
 }
 
+export interface RunEntity {
+  id: string;
+  project_id: string;
+  dataset_id: string;
+  model_family: string;
+  hyperparameters: Record<string, any>;
+  metrics: {
+    accuracy?: number;
+    f1_weighted?: number;
+    log_loss?: number;
+    feature_importances?: Record<string, number>;
+    per_sample_predictions?: Array<{
+      sample_index: number;
+      y_true: number;
+      y_pred: number;
+      y_prob: number;
+      is_error: boolean;
+      error_delta: number;
+    }>;
+  };
+  status: string;
+  created_at: string;
+}
+
 export async function fetchCapabilities(): Promise<CapabilityConfig> {
   const res = await fetch(`${API_BASE_URL}/capabilities`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Capabilities request failed with status ${res.status}`);
@@ -106,5 +130,21 @@ export async function uploadDataset(projectId: string, file: File): Promise<Data
     body: formData,
   });
   if (!res.ok) throw new Error(`Dataset upload failed with status ${res.status}`);
+  return res.json();
+}
+
+export async function fetchProjectRuns(projectId: string): Promise<RunEntity[]> {
+  const res = await fetch(`${API_BASE_URL}/projects/${projectId}/runs`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Runs request failed with status ${res.status}`);
+  return res.json();
+}
+
+export async function trainModel(projectId: string, data: { dataset_id: string; model_family: string; hyperparameters?: Record<string, any> }): Promise<RunEntity> {
+  const res = await fetch(`${API_BASE_URL}/projects/${projectId}/train`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`Model training failed with status ${res.status}`);
   return res.json();
 }
