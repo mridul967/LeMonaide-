@@ -1,0 +1,12 @@
+"""
+Master API v1 router consolidating endpoints.
+"""
+
+from fastapi import APIRouter
+
+from api.v1.capabilities import router as capabilities_router
+from api.v1.projects import router as projects_router
+
+api_v1_router = APIRouter(prefix="/api/v1")
+api_v1_router.include_router(capabilities_router)
+api_v1_router.include_router(projects_router)

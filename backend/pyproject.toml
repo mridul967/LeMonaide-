@@ -1,0 +1,26 @@
+[project]
+name = "lemonaide-backend"
+version = "0.1.0"
+description = "FastAPI backend engine for LeMonaide EvidenceOps"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.30.0",
+    "sqlalchemy>=2.0.30",
+    "aiosqlite>=0.20.0",
+    "pydantic>=2.7.0",
+    "pydantic-settings>=2.3.0",
+    "pyyaml>=6.0.1",
+    "scikit-learn>=1.5.0",
+    "pandas>=2.2.0",
+    "numpy>=1.26.0",
+    "greenlet>=3.5.4",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["api", "config", "db"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
