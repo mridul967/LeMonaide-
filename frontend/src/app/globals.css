@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-canvas: #0b0d13;
+    --bg-panel: #12151f;
+    --bg-surface: #181c2b;
+    --border-subtle: #242a3e;
+    
+    --text-primary: #f0f4f8;
+    --text-muted: #8b95a7;
+
+    --accent-citrus: #d4e157;
+    --accent-amber: #ffb74d;
+    --accent-cyan: #4dd0e1;
+    --accent-violet: #b39ddb;
+
+    --status-success: #66bb6a;
+    --status-danger: #ef5350;
+  }
+
+  body {
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+    min-height: 100vh;
+    margin: 0;
+  }
+}
+
+.citrus-card {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+}
+
+.citrus-card-interactive {
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.citrus-card-interactive:hover {
+  border-color: var(--accent-citrus);
+}
+
+.text-citrus {
+  color: var(--accent-citrus);
+}
+
+.bg-citrus {
+  background-color: var(--accent-citrus);
+}
