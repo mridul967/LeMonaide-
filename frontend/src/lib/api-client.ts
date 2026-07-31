@@ -30,36 +30,50 @@ export interface ProjectEntity {
   created_at: string;
 }
 
-/**
- * Fetches dynamic system capabilities from the backend.
- */
+export interface DatasetColumnInfo {
+  name: string;
+  dtype: string;
+  missing_count: number;
+  missing_pct: number;
+  numeric_stats?: { mean?: number; std?: number; min?: number; max?: number };
+  top_categories?: Record<string, number>;
+}
+
+export interface DatasetEntity {
+  id: string;
+  project_id: string;
+  name: string;
+  version: string;
+  file_path: string;
+  checksum: string;
+  profile_summary?: {
+    total_rows: number;
+    total_columns: number;
+    columns: DatasetColumnInfo[];
+    target_column?: string;
+    target_distribution?: Record<string, number>;
+  };
+  created_at: string;
+}
+
 export async function fetchCapabilities(): Promise<CapabilityConfig> {
   const res = await fetch(`${API_BASE_URL}/capabilities`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Capabilities request failed with status ${res.status}`);
   return res.json();
 }
 
-/**
- * Fetches dynamic UI settings and feature flags from the backend.
- */
 export async function fetchUIConfig(): Promise<UIConfig> {
   const res = await fetch(`${API_BASE_URL}/ui-config`, { cache: "no-store" });
   if (!res.ok) throw new Error(`UI config request failed with status ${res.status}`);
   return res.json();
 }
 
-/**
- * Lists all active projects from the backend.
- */
 export async function fetchProjects(): Promise<ProjectEntity[]> {
   const res = await fetch(`${API_BASE_URL}/projects`, { cache: "no-store" });
   if (!res.ok) throw new Error(`Projects request failed with status ${res.status}`);
   return res.json();
 }
 
-/**
- * Creates a new research project.
- */
 export async function createProject(data: { name: string; description?: string; task_type?: string }): Promise<ProjectEntity> {
   const res = await fetch(`${API_BASE_URL}/projects`, {
     method: "POST",
@@ -67,5 +81,30 @@ export async function createProject(data: { name: string; description?: string; 
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`Project creation failed with status ${res.status}`);
+  return res.json();
+}
+
+export async function fetchProjectDatasets(projectId: string): Promise<DatasetEntity[]> {
+  const res = await fetch(`${API_BASE_URL}/projects/${projectId}/datasets`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`Datasets request failed with status ${res.status}`);
+  return res.json();
+}
+
+export async function seedDemoDataset(projectId: string): Promise<DatasetEntity> {
+  const res = await fetch(`${API_BASE_URL}/projects/${projectId}/datasets/seed-demo`, {
+    method: "POST",
+  });
+  if (!res.ok) throw new Error(`Demo dataset seeding failed with status ${res.status}`);
+  return res.json();
+}
+
+export async function uploadDataset(projectId: string, file: File): Promise<DatasetEntity> {
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`${API_BASE_URL}/projects/${projectId}/datasets/upload`, {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) throw new Error(`Dataset upload failed with status ${res.status}`);
   return res.json();
 }

@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchCapabilities, fetchProjects, createProject } from "@/lib/api-client";
 import { useState } from "react";
+import Link from "next/link";
 import { 
   FlaskConical, 
   GitCommit, 
@@ -11,7 +12,8 @@ import {
   Network, 
   Plus, 
   CheckCircle2,
-  FolderKanban
+  FolderKanban,
+  Database
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -115,19 +117,25 @@ export default function DashboardPage() {
         ) : projects && projects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {projects.map((p) => (
-              <div key={p.id} className="citrus-card-interactive p-4 space-y-2">
+              <Link key={p.id} href={`/projects/${p.id}/datasets`} className="citrus-card-interactive p-4 space-y-2 block">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold text-sm text-[#f0f4f8]">{p.name}</h4>
+                  <h4 className="font-semibold text-sm text-[#f0f4f8] flex items-center space-x-2">
+                    <Database className="w-4 h-4 text-[#4dd0e1]" />
+                    <span>{p.name}</span>
+                  </h4>
                   <span className="text-[10px] px-2 py-0.5 rounded bg-[#4dd0e1]/10 text-[#4dd0e1]">
                     {p.task_type}
                   </span>
                 </div>
                 <p className="text-xs text-[#8b95a7] line-clamp-2">{p.description || "No description provided."}</p>
-                <div className="flex items-center text-[10px] text-[#66bb6a] space-x-1 pt-2 border-t border-[#242a3e]">
-                  <CheckCircle2 className="w-3 h-3" />
-                  <span>Evidence Loop Active</span>
+                <div className="flex items-center justify-between text-[10px] text-[#66bb6a] pt-2 border-t border-[#242a3e]">
+                  <span className="flex items-center space-x-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    <span>Dataset Hub Active</span>
+                  </span>
+                  <span className="text-[#d4e157]">Open Workspace →</span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         ) : (

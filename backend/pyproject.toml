@@ -16,10 +16,11 @@ dependencies = [
     "pandas>=2.2.0",
     "numpy>=1.26.0",
     "greenlet>=3.5.4",
+    "python-multipart>=0.0.9",
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["api", "config", "db"]
+packages = ["api", "config", "db", "services"]
 
 [build-system]
 requires = ["hatchling"]
