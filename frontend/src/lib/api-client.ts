@@ -145,6 +145,9 @@ export async function trainModel(projectId: string, data: { dataset_id: string; 
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
-  if (!res.ok) throw new Error(`Model training failed with status ${res.status}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.detail || `Model training failed with status ${res.status}`);
+  }
   return res.json();
 }

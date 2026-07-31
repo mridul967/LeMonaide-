@@ -6,7 +6,6 @@ Fits scikit-learn models, evaluates metrics, and computes per-sample predictions
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
 import joblib
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -15,7 +14,10 @@ from sklearn.model_selection import train_test_split
 
 
 def instantiate_model(model_family: str, hyperparameters: Dict[str, Any]) -> Any:
-    """Instantiates an ML estimator based on model_family string."""
+    """
+    Instantiates an ML estimator.
+    Raises ValueError with explicit reason if model family is unavailable.
+    """
     if model_family == "logistic_regression":
         c_val = float(hyperparameters.get("C", 1.0))
         return LogisticRegression(C=c_val, max_iter=1000, random_state=42)
@@ -28,10 +30,11 @@ def instantiate_model(model_family: str, hyperparameters: Dict[str, Any]) -> Any
             import xgboost as xgb
             return xgb.XGBClassifier(n_estimators=int(hyperparameters.get("n_estimators", 100)), random_state=42)
         except ImportError:
-            # Fallback to RandomForest if XGBoost is not installed
-            return RandomForestClassifier(n_estimators=100, random_state=42)
+            raise ValueError("Model family 'xgboost' is currently unavailable. Reason: xgboost library is not installed in runtime.")
+    elif model_family == "pytorch":
+        raise ValueError("Model family 'pytorch' is currently unavailable. Reason: PyTorch deep learning estimator adapter is not enabled in Phase 1 MVP.")
     else:
-        return LogisticRegression(max_iter=1000, random_state=42)
+        raise ValueError(f"Model family '{model_family}' is unrecognized or unsupported by the training engine.")
 
 
 def train_baseline_model(
@@ -41,10 +44,7 @@ def train_baseline_model(
     target_column: str = "target",
     save_dir: Path = None,
 ) -> Tuple[Dict[str, float], Dict[str, float], List[Dict[str, Any]]]:
-    """
-    Trains a baseline model on the specified CSV file.
-    Returns (metrics_dict, feature_importances, per_sample_predictions).
-    """
+    """Trains a baseline model on the specified CSV/Parquet file."""
     df = pd.read_csv(file_path) if file_path.suffix == ".csv" else pd.read_parquet(file_path)
     
     if target_column not in df.columns:
@@ -77,7 +77,6 @@ def train_baseline_model(
         "log_loss": round(loss, 4),
     }
 
-    # Extract feature importances
     feature_importances = {}
     if hasattr(model, "feature_importances_"):
         for col, imp in zip(X.columns, model.feature_importances_):
@@ -86,7 +85,6 @@ def train_baseline_model(
         for col, coef in zip(X.columns, model.coef_[0]):
             feature_importances[col] = round(float(abs(coef)), 4)
 
-    # Compute per-sample prediction details for Failure Lab
     per_sample_predictions = []
     original_test_df = df.loc[idx_test]
     for i, (orig_idx, row) in enumerate(original_test_df.iterrows()):
